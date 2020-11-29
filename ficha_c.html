@@ -1,0 +1,193 @@
+<div class="panel ficha ">
+  <span style="font-size: 75%;font-weight: bold;">Cód. Captación {{elemento.id}}</span>
+  <span onclick="ocultaFicha()" class="material-icons derecha">visibility_off</span>
+  <span onclick="cargar_fotos()" class="material-icons derecha">add_a_photo</span>
+  <div id="carga_fotos" class="foto invisible">
+    Seleccione unha foto:<br>
+    <input id="file64_foto" class="imagenComprimir" onchange="comprimir('foto')" name="files64_foto" type="file" value="Archivo" multiple="false" accept="image/*"> <span id="check_foto" class="material-icons" style="display: none; color: #3A3;">check_circle</span><br>
+    <input id="string64_foto" type="text" name="string64_interna" value="" style="display: none;">
+		{% if not elemento.foto_principal %}
+      {% set foto_princ = 0 %}
+      {% set nombre_foto_princ = "sin_foto.png" %}
+    {% else %}
+      {% set foto_princ = 1 %}
+      {% set nombre_foto_princ = elemento.ruta %}
+    {% endif %}
+    <span id="cargando" class="invisible">Comprimindo foto...</span>
+    <span id="subir_foto_icon" class="invisible"> <i onclick="subirFoto('{{resultados.tipo[0]}}', '{{elemento.id}}', '{{foto_princ}}' )" class="material-icons negro">cloud_upload</i></span>
+  </div>
+  <div id="foto_principal" class="foto">
+    <img src="/static/fotos/{{nombre_foto_princ}}" {% if not foto_princ %}onclick="cargar_fotos()" style="cursor:pointer;"{% endif %} alt="Foto">
+  </div>
+  <div id="mas_fotos" class="{% if foto_princ == 0 %}invisible{% endif %}">
+  <span onclick="cargaMasFotos('{{elemento.id}}','{{resultados.tipo[0]}}')" class="material-icons negro">collections</span> Ver máis fotos
+  </div>
+
+  <span id="boton_editar" onclick="modoEdicion()" class="material-icons derecha">edit</span>
+  <span onclick="actualizaElemento('{{resultados.tipo[0]}}','{{elemento.provincia}}{{elemento.municipio}}{{elemento.cod_eiel}}')" class="invisible derecha editado boton_upload"><span class="material-icons">arrow_circle_up</span> Subir cambios</span>
+
+  <span id="formulario">
+
+    <div class="ficha_identificacion apartado_ficha apartado_ficha_linea">
+      <span id="etiqueta-1" class="etiqueta">Latitude<br></span>
+      <span class="valor">{% if elemento.latitud %}{{'%0.5f'| format(elemento.latitud)}}{% else %}-{% endif %}<br></span>
+
+      <span id="etiqueta-2" class="etiqueta">Lonxitude<br></span>
+      <span class="valor">{% if elemento.longitud %}{{'%0.5f'| format(elemento.longitud)}}{% else %}-{% endif %}<br></span>
+
+      <span id="etiqueta-3a" class="etiqueta">Provincia<br></span>
+      <span class="valor">{% if elemento.provincia %}{{elemento.provincia}}{% else %}-{% endif %}<br></span>
+
+      <span id="etiqueta-3b" class="etiqueta">Municipio<br></span>
+      <span class="valor">{% if elemento.municipio %}{{elemento.municipio}}{% else %}-{% endif %}<br></span>
+
+      <span id="etiqueta-3c" class="etiqueta">Cód.EIEL<br></span>
+      <span class="valor">{% if elemento.cod_eiel %}{{elemento.cod_eiel}}{% else %}-{% endif %}<br></span>
+
+      <span id="etiqueta-4" class="etiqueta">Núcleo<br></span>
+      <span class="editar">{% if elemento.nucleo %}{{elemento.nucleo}}{% else %}-{% endif %}<br></span>
+      <input id="valor-4" type="text" class="valor editar invisible" name="nucleo" value="{% if elemento.nucleo %}{{elemento.nucleo}}{% endif %}"><br class="valor editar invisible">
+
+      <span id="etiqueta-5" class="etiqueta">Lugar<br></span>
+      <span class="editar">{% if elemento.lugar %}{{elemento.lugar}}{% else %}-{% endif %}<br></span>
+      <input id="valor-5" type="text" class="valor editar invisible" name="lugar" value="{% if elemento.lugar %}{{elemento.lugar}}{% endif %}"><br class="valor editar invisible">
+
+      <span id="etiqueta-6" class="etiqueta">Titular<br></span>
+      <span class="editar">{% if elemento.titular %}{{elemento.titular}}{% else %}-{% endif %}<br></span>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 0)"><input type="radio" name="titular" value="MUN" {% if elemento.titular == 'MUN' %}checked{% endif %}> Municipal<br></label>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 0)"><input type="radio" name="titular" value="VEC" {% if elemento.titular == 'VEC' %}checked{% endif %}> Veciñal<br></label>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 0)"><input type="radio" name="titular" value="AUG" {% if elemento.titular == 'AUG' %}checked{% endif %}> Augas de Galicia<br></label>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 0)"><input type="radio" name="titular" value="MAN" {% if elemento.titular == 'MAN' %}checked{% endif %}> Mancomunidade<br></label>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 0)"><input type="radio" name="titular" value="PRI" {% if elemento.titular == 'PRI' %}checked{% endif %}> Privada<br></label>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 0)"><input type="radio" name="titular" value="EMM" {% if elemento.titular == 'EMM' %}checked{% endif %}> Empresa municipal<br></label>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 0)"><input type="radio" name="titular" value="EMP" {% if elemento.titular == 'EMP' %}checked{% endif %}> Empresa pública<br></label>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 0)"><input type="radio" name="titular" value="CON" {% if elemento.titular == 'CON' %}checked{% endif %}> Consorcio<br></label>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 1)"><input type="radio" name="titular" {% if (elemento.titular != 'MUN' and elemento.titular != 'VEC' and elemento.titular != 'AUG' and elemento.titular != 'MAN' and elemento.titular != 'PRI' and elemento.titular != 'EMM' and elemento.titular != 'EMP' and elemento.titular != 'CON' and elemento.titular != None) %}checked{% endif %}> Outros<br></label>
+			<span class="editar invisible">
+				<input class="valor {% if (elemento.titular == 'MUN' or elemento.titular == 'VEC' or  elemento.titular == 'AUG' or elemento.titular == 'MAN' or elemento.titular == 'PRI' or elemento.titular == 'EMM' or elemento.titular == 'EMP' or elemento.titular == 'CON' or elemento.titular == None) %}invisible{% endif %} tit-outros" type="text" name="titular" value="{% if elemento.titular != 'MUN' and elemento.titular != 'VEC' and elemento.titular != 'AUG' and elemento.titular != 'MAN' and elemento.titular != 'PRI' and elemento.titular != 'EMM' and elemento.titular != 'EMP' and elemento.titular != 'CON' %} {{elemento.titular}} {% endif %}">
+			</span>
+
+      <span id="etiqueta-7" class="etiqueta">Xestión<br></span>
+      <span class="editar">{% if elemento.gestion %}{{elemento.gestion}}{% else %}-{% endif %}<br></span>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 0)"><input type="radio" name="gestion" value="MUN" {% if elemento.gestion == 'MUN' %}checked{% endif %}> Municipal<br></label>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 0)"><input type="radio" name="gestion" value="VEC" {% if elemento.gestion == 'VEC' %}checked{% endif %}> Veciñal<br></label>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 0)"><input type="radio" name="gestion" value="AUG" {% if elemento.gestion == 'AUG' %}checked{% endif %}> Augas de Galicia<br></label>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 0)"><input type="radio" name="gestion" value="MAN" {% if elemento.gestion == 'MAN' %}checked{% endif %}> Mancomunidade<br></label>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 0)"><input type="radio" name="gestion" value="PRI" {% if elemento.gestion == 'PRI' %}checked{% endif %}> Privada<br></label>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 0)"><input type="radio" name="gestion" value="EMM" {% if elemento.gestion == 'EMM' %}checked{% endif %}> Empresa municipal<br></label>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 0)"><input type="radio" name="gestion" value="EMP" {% if elemento.gestion == 'EMP' %}checked{% endif %}> Empresa pública<br></label>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 0)"><input type="radio" name="gestion" value="CON" {% if elemento.gestion == 'CON' %}checked{% endif %}> Consorcio<br></label>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 1)"><input type="radio" name="gestion" {% if (elemento.gestion != 'MUN' and elemento.gestion != 'VEC' and elemento.gestion != 'AUG' and elemento.gestion != 'MAN' and elemento.gestion != 'PRI' and elemento.gestion != 'EMM' and elemento.gestion != 'EMP' and elemento.gestion != 'CON' and elemento.gestion != None) %}checked{% endif %}> Outros<br></label>
+      <span class="editar invisible">
+        <input class="valor {% if (elemento.gestion == 'MUN' or elemento.gestion == 'VEC' or  elemento.gestion == 'AUG' or elemento.gestion == 'MAN' or elemento.gestion == 'PRI' or elemento.gestion == 'EMM' or elemento.gestion == 'EMP' or elemento.gestion == 'CON' or elemento.gestion == None) %}invisible{% endif %} xest-outros">
+      </span>
+    </div>
+
+    <div class="ficha_caracteristicas apartado_ficha apartado_ficha_linea">
+      <span id="etiqueta-8" class="etiqueta">Estado<br></span>
+      <span class="editar">{% if elemento.estado %}{{elemento.estado}}{% else %}-{% endif %}<br></span>
+      <label class="valor 8 editar invisible"><input type="radio" name="estado" value="BO" {% if elemento.estado == 'BO' %}checked{% endif %}> Bo<br></label>
+      <label class="valor 8 editar invisible"><input type="radio" name="estado" value="REG" {% if elemento.estado == 'REG' %}checked{% endif %}> Regular<br></label>
+      <label class="valor 8 editar invisible"><input type="radio" name="estado" value="MAL" {% if elemento.estado == 'MAL' %}checked{% endif %}> Malo<br></label>
+
+      <span id="etiqueta-9" class="etiqueta">Bacía<br></span>
+      <span class="editar">{% if elemento.bacia %}{{elemento.bacia}}{% else %}-{% endif %}<br></span>
+      <input id="valor-9" type="text" class="valor editar invisible" name="bacia" value="{% if elemento.bacia %}{{elemento.bacia}}{% endif %}"><br class="valor editar invisible">
+
+      <span id="etiqueta-10" class="etiqueta">Uso<br></span>
+      <span class="editar">{% if elemento.uso %}{{elemento.uso}}{% else %}-{% endif %}<br></span>
+      <label class="valor 10 editar invisible"><input type="radio" name="ubicacion" value="ORD" {% if elemento.ubicacion == 'ORD' %}checked{% endif %}> Ordinario<br></label>
+      <label class="valor 10 editar invisible"><input type="radio" name="ubicacion" value="EXT" {% if elemento.ubicacion == 'EXT' %}checked{% endif %}> Extraordinario<br></label>
+
+      <span id="etiqueta-10a" class="etiqueta">Legalizada<br></span>
+      <span class="editar">{% if elemento.legalizada %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 10a editar invisible"><input type="radio" name="legalizada" value="1" {% if elemento.legalizada %}checked{% endif %}> Si<br></label>
+      <label class="valor 10a editar invisible"><input type="radio" name="legalizada" value="0" {% if not elemento.legalizada %}checked{% endif %}> Non<br></label>
+
+      <span id="etiqueta-11" class="etiqueta">Orixe<br></span>
+      <span class="editar">{% if elemento.origen %}{{elemento.origen}}{% else %}-{% endif %}<br></span>
+      <label class="valor 11 editar invisible" onclick="outros('ori', 0)"><input type="radio" name="origen" value="CAN" {% if elemento.origen == 'CAN' %}checked{% endif %}> Canle<br></label>
+      <label class="valor 11 editar invisible" onclick="outros('ori', 0)"><input type="radio" name="origen" value="POZ" {% if elemento.origen == 'POZ' %}checked{% endif %}> Pozo<br></label>
+      <label class="valor 11 editar invisible" onclick="outros('ori', 0)"><input type="radio" name="origen" value="MAC" {% if elemento.origen == 'MAC' %}checked{% endif %}> Manancial<br></label>
+      <label class="valor 11 editar invisible" onclick="outros('ori', 0)"><input type="radio" name="origen" value="PEX" {% if elemento.origen == 'PEX' %}checked{% endif %}> Pozo excavado<br></label>
+      <label class="valor 11 editar invisible" onclick="outros('ori', 0)"><input type="radio" name="origen" value="AUM" {% if elemento.origen == 'AUM' %}checked{% endif %}> Auga de mar<br></label>
+      <label class="valor 11 editar invisible" onclick="outros('ori', 0)"><input type="radio" name="origen" value="GFI" {% if elemento.origen == 'GFI' %}checked{% endif %}> Galería de filtración<br></label>
+      <label class="valor 11 editar invisible" onclick="outros('ori', 0)"><input type="radio" name="origen" value="ENC" {% if elemento.origen == 'ENC' %}checked{% endif %}> Encoro<br></label>
+      <label class="valor 11 editar invisible" onclick="outros('ori', 1)"><input type="radio" name="origen" {% if elemento.origen != 'CAN' and elemento.origen != 'POZ' and elemento.origen != 'MAC' and elemento.origen != 'PEX' and elemento.origen != 'AUM' and elemento.origen != 'GFI' and elemento.origen != 'ENC' and elemento.origen != None %}checked{% endif %}> Outros<br></label>
+			<span class="editar invisible">
+				<input class="valor-11 {% if elemento.origen == 'CAN' or elemento.origen == 'POZ' or elemento.origen == 'MAC' or elemento.origen == 'PEX' or elemento.origen == 'AUM' or elemento.origen == 'GFI' or elemento.origen == 'ENC' or elemento.material == None %}invisible{% endif %} mat-outros" type="text" name="mat-11" value="{% if elemento.material != 'FOR' and elemento.material != 'LAD' and elemento.material != 'MET' and elemento.material != 'FIB'and elemento.material != None %}{{elemento.material}}{% endif %}"><br>
+			</span>
+      <span id="etiqueta-12" class="etiqueta">Limitación de acceso<br></span>
+      <span class="editar">{% if elemento.proteccion %}{{elemento.proteccion}}{% else %}-{% endif %}<br></span>
+      <label class="valor 12 editar invisible"><input type="radio" name="proteccion" value="1" {% if elemento.proteccion %}checked{% endif %}> Correcto<br></label>
+      <label class="valor 12 editar invisible"><input type="radio" name="proteccion" value="0" {% if not elemento.proteccion %}checked{% endif %}> Deficiente<br></label>
+
+
+
+      <span id="etiqueta-13" class="etiqueta">Tipo<br></span>
+      <span class="editar">{% if elemento.tipo %}{{elemento.tipo}}{% else %}-{% endif %}<br></span>
+      <label class="valor 13 editar invisible"><input type="radio" name="tipo" value="DIR" {% if elemento.ubicacion == 'DIR' %}checked{% endif %}> Directo<br></label>
+      <label class="valor 13 editar invisible"><input type="radio" name="tipo" value="AZD" {% if elemento.ubicacion == 'AZD' %}checked{% endif %}> Azude<br></label>
+      <label class="valor 13 editar invisible"><input type="radio" name="tipo" value="INF" {% if elemento.ubicacion == 'INF' %}checked{% endif %}> Infiltración<br></label>
+
+  </div>
+
+    <div class="ficha_equipamento">
+      <span id="etiqueta-19" class="etiqueta">Subministración eléctrica<br></span>
+      <span class="editar">{% if elemento.electricidad %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 19 editar invisible"><input type="radio" name="electricidad" value="1" {% if elemento.electricidad %}checked{% endif %}> Si<br></label>
+      <label class="valor 19 editar invisible"><input type="radio" name="electricidad" value="0" {% if not elemento.electricidad %}checked{% endif %}> Non<br></label>
+
+      <span id="etiqueta-20" class="etiqueta">Telexestión<br></span>
+      <span class="editar">{% if elemento.telegestion %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 20 editar invisible"><input type="radio" name="telegestion" value="1" {% if elemento.telegestion %}checked{% endif %}> Si<br></label>
+      <label class="valor 20 editar invisible"><input type="radio" name="telegestion" value="0" {% if not elemento.telegestion %}checked{% endif %}> Non<br></label>
+
+      <span id="etiqueta-21" class="etiqueta">Bombeo<br></span>
+      <span class="editar">{% if elemento.cloracion %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 21 editar invisible"><input type="radio" name="cloracion" value="1" {% if elemento.cloracion %}checked{% endif %}> Si<br></label>
+      <label class="valor 21 editar invisible"><input type="radio" name="cloracion" value="0" {% if not elemento.cloracion %}checked{% endif %}> Non<br></label>
+
+      <span id="etiqueta-22" class="etiqueta">Caudalímetro<br></span>
+      <span class="editar">{% if elemento.caudalimetro %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 22 editar invisible"><input type="radio" name="caudalimetro" value="1" {% if elemento.caudalimetro %}checked{% endif %}> Si<br></label>
+      <label class="valor 22 editar invisible"><input type="radio" name="caudalimetro" value="0" {% if not elemento.caudalimetro %}checked{% endif %}> Non<br></label>
+
+      <span id="etiqueta-23" class="etiqueta">Notas<br></span>
+      <span class="editar">{% if elemento.notas %}{{elemento.notas}}{% else %}-{% endif %}<br></span>
+      <input id="valor-23" type="text" class="valor editar invisible" name="notas" value="{% if elemento.notas %}{{elemento.notas}}{% endif %}"><br class="valor editar invisible">
+    </div>
+
+  </span>
+	<span onclick="actualizaElemento('{{resultados.tipo[0]}}','{{elemento.provincia}}{{elemento.municipio}}{{elemento.cod_eiel}}')" class="invisible derecha editado boton_upload"><span class="material-icons">arrow_circle_up</span> Subir cambios</span>
+	<span id="check_upload" class="invisible">
+    <span class="material-icons check" style="">check_circle</span> Cambios actualizados correctamente
+  </span>
+  <span class="invisible confirmar">
+    <span class="material-icons" onclick="ConfirmaActualizaElemento('{{resultados.elemento}}', '{{resultados.id}}')">check</span> Confirmar cambios
+  </span>
+  <br>
+  <span class="invisible confirmar">
+    <span class="material-icons" onclick="cancelaActualizaElemento('{{resultados.elemento}}', {{resultados.id}})">
+      cancel
+    </span> Cancelar cambios
+  </span>
+</div>
+
+<script type="text/javascript">
+  $('.valor').keyup(function( event ) {
+    $(".boton_upload").show();
+    var indice = this.id.split("-")[1];
+    $("#etiqueta-"+indice).addClass("editado");
+    $(this).addClass("editado");
+  });
+	$('label.valor>input').change(function () {
+		var nombre = this.name;
+    var indice = $(this).parent("label").attr("class").split(" ")[1]
+		$("input[name="+ nombre+"]").parent("label").removeClass("editado");
+		$(this).parent("label").addClass("editado");
+    $(this).addClass("editado");
+		$("#etiqueta-"+indice).addClass("editado");
+		$(".boton_upload").show();
+	});
+</script>

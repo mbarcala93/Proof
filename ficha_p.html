@@ -1,0 +1,195 @@
+<div class="panel ficha ">
+  <span style="font-size: 75%;font-weight: bold;">Cód. Potabilizadora {{elemento.id}}</span>
+  <span onclick="ocultaFicha()" class="material-icons derecha">visibility_off</span>
+  <span onclick="cargar_fotos()" class="material-icons derecha">add_a_photo</span>
+  <div id="carga_fotos" class="foto invisible">
+    Seleccione unha foto:<br>
+    <input id="file64_foto" class="imagenComprimir" onchange="comprimir('foto')" name="files64_foto" type="file" value="Archivo" multiple="false" accept="image/*"> <span id="check_foto" class="material-icons" style="display: none; color: #3A3;">check_circle</span><br>
+    <input id="string64_foto" type="text" name="string64_interna" value="" style="display: none;">
+		{% if not elemento.foto_principal %}
+      {% set foto_princ = 0 %}
+      {% set nombre_foto_princ = "sin_foto.png" %}
+    {% else %}
+      {% set foto_princ = 1 %}
+      {% set nombre_foto_princ = elemento.ruta %}
+    {% endif %}
+    <span id="cargando" class="invisible">Comprimindo foto...</span>
+    <span id="subir_foto_icon" class="invisible"> <i onclick="subirFoto('{{resultados.tipo[0]}}', '{{elemento.id}}', '{{foto_princ}}' )" class="material-icons negro">cloud_upload</i></span>
+  </div>
+  <div id="foto_principal" class="foto">
+    <img src="/static/fotos/{{nombre_foto_princ}}" {% if not foto_princ %}onclick="cargar_fotos()" style="cursor:pointer;"{% endif %} alt="Foto">
+  </div>
+  <div id="mas_fotos" class="{% if foto_princ == 0 %}invisible{% endif %}">
+  <span onclick="cargaMasFotos('{{elemento.id}}','{{resultados.tipo[0]}}')" class="material-icons negro">collections</span> Ver máis fotos
+  </div>
+
+  <span id="boton_editar" onclick="modoEdicion()" class="material-icons derecha">edit</span>
+  <span onclick="actualizaElemento('{{resultados.tipo[0]}}','{{elemento.provincia}}{{elemento.municipio}}{{elemento.cod_eiel}}')" class="invisible derecha editado boton_upload"><span class="material-icons">arrow_circle_up</span> Subir cambios</span>
+
+  <span id="formulario">
+
+    <div class="ficha_identificacion apartado_ficha apartado_ficha_linea">
+      <span id="etiqueta-1" class="etiqueta">Latitude<br></span>
+      <span class="valor">{% if elemento.latitud %}{{'%0.5f'| format(elemento.latitud)}}{% else %}-{% endif %}<br></span>
+
+      <span id="etiqueta-2" class="etiqueta">Lonxitude<br></span>
+      <span class="valor">{% if elemento.longitud %}{{'%0.5f'| format(elemento.longitud)}}{% else %}-{% endif %}<br></span>
+
+      <span id="etiqueta-3a" class="etiqueta">Provincia<br></span>
+      <span class="valor">{% if elemento.provincia %}{{elemento.provincia}}{% else %}-{% endif %}<br></span>
+
+      <span id="etiqueta-3b" class="etiqueta">Municipio<br></span>
+      <span class="valor">{% if elemento.municipio %}{{elemento.municipio}}{% else %}-{% endif %}<br></span>
+
+      <span id="etiqueta-3c" class="etiqueta">Cód.EIEL<br></span>
+      <span class="valor">{% if elemento.cod_eiel %}{{elemento.cod_eiel}}{% else %}-{% endif %}<br></span>
+
+      <span id="etiqueta-4" class="etiqueta">Núcleo<br></span>
+      <span class="editar">{% if elemento.nucleo %}{{elemento.nucleo}}{% else %}-{% endif %}<br></span>
+      <input id="valor-4" type="text" class="valor editar invisible" name="nucleo" value="{% if elemento.nucleo %}{{elemento.nucleo}}{% endif %}"><br class="valor editar invisible">
+
+      <span id="etiqueta-5" class="etiqueta">Lugar<br></span>
+      <span class="editar">{% if elemento.lugar %}{{elemento.lugar}}{% else %}-{% endif %}<br></span>
+      <input id="valor-5" type="text" class="valor editar invisible" name="lugar" value="{% if elemento.lugar %}{{elemento.lugar}}{% endif %}"><br class="valor editar invisible">
+
+      <span id="etiqueta-6" class="etiqueta">Titular<br></span>
+      <span class="editar">{% if elemento.titular %}{{elemento.titular}}{% else %}-{% endif %}<br></span>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 0)"><input type="radio" name="titular" value="MUN" {% if elemento.titular == 'MUN' %}checked{% endif %}> Municipal<br></label>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 0)"><input type="radio" name="titular" value="MAN" {% if elemento.titular == 'MAN' %}checked{% endif %}> Mancomunidade<br></label>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 0)"><input type="radio" name="titular" value="AUT" {% if elemento.titular == 'AUT' %}checked{% endif %}> Autonómica<br></label>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 0)"><input type="radio" name="titular" value="PRO" {% if elemento.titular == 'PRO' %}checked{% endif %}> Provincial<br></label>
+      <label class="valor 6 editar invisible" onclick="outros('tit', 1)"><input type="radio" name="titular" {% if (elemento.titular != 'MUN' and elemento.titular != 'man' and elemento.titular != 'AUT' and elemento.titular != 'PRO' and elemento.titular != None) %}checked{% endif %}> Outros<br></label>
+			<span class="editar invisible">
+				<input class="valor {% if (elemento.titular == 'MUN' or elemento.titular == 'MAN' or  elemento.titular == 'AUT' or elemento.titular == 'PRO' or elemento.titular == None) %}invisible{% endif %} tit-outros" type="text" name="titular" value="{% if elemento.titular != 'MUN' and elemento.titular != 'MAN' and elemento.titular != 'AUT' and elemento.titular != 'PRO' %} {{elemento.titular}} {% endif %}">
+    </span>
+
+      <span id="etiqueta-7" class="etiqueta">Xestión<br></span>
+      <span class="editar">{% if elemento.gestion %}{{elemento.gestion}}{% else %}-{% endif %}<br></span>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 0)"><input type="radio" name="gestion" value="MUN" {% if elemento.gestion == 'MUN' %}checked{% endif %}> Municipal<br></label>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 0)"><input type="radio" name="gestion" value="MAN" {% if elemento.gestion == 'MAN' %}checked{% endif %}> Mancomunidade<br></label>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 0)"><input type="radio" name="gestion" value="AUT" {% if elemento.gestion == 'AUT' %}checked{% endif %}> Autonómica<br></label>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 0)"><input type="radio" name="gestion" value="PRO" {% if elemento.gestion == 'PRO' %}checked{% endif %}> Provincial<br></label>
+      <label class="valor 7 editar invisible" onclick="outros('xest', 1)"><input type="radio" name="gestion" {% if (elemento.gestion != 'MUN' and elemento.gestion != 'MAN' and elemento.gestion != 'AUT' and elemento.gestion != 'PRO' and elemento.gestion != None) %}checked{% endif %}> Outros<br></label>
+      <span class="editar invisible">
+        <input class="valor {% if (elemento.gestion == 'MUN' or elemento.gestion == 'MAN' or  elemento.gestion == 'AUT' or elemento.gestion == 'PRO' or elemento.gestion == None) %}invisible{% endif %} xest-outros">
+
+
+    </div>
+
+    <div class="ficha_caracteristicas apartado_ficha apartado_ficha_linea">
+      <span id="etiqueta-8" class="etiqueta">Estado<br></span>
+      <span class="editar">{% if elemento.estado %}{{elemento.estado}}{% else %}-{% endif %}<br></span>
+      <label class="valor 8 editar invisible"><input type="radio" name="estado" value="BO" {% if elemento.estado == 'BO' %}checked{% endif %}> Bo<br></label>
+      <label class="valor 8 editar invisible"><input type="radio" name="estado" value="REG" {% if elemento.estado == 'REG' %}checked{% endif %}> Regular<br></label>
+      <label class="valor 8 editar invisible"><input type="radio" name="estado" value="MAL" {% if elemento.estado == 'MAL' %}checked{% endif %}> Malo<br></label>
+
+      <span id="etiqueta-9" class="etiqueta">Descrición<br></span>
+      <span class="editar">{% if elemento.descripcion %}{{elemento.descripcion}}{% else %}-{% endif %}<br></span>
+      <input id="valor-9" type="text" class="valor editar invisible" name="descripcion" value="{% if elemento.descripcion %}{{elemento.descripcion}}{% endif %}"><br class="valor editar invisible">
+
+      <span id="etiqueta-10" class="etiqueta">Posición<br></span>
+      <span class="editar">{% if elemento.ubicacion %}{{elemento.ubicacion}}{% else %}-{% endif %}<br></span>
+      <label class="valor 10 editar invisible"><input type="radio" name="ubicacion" value="SOT" {% if elemento.ubicacion == 'SOT' %}checked{% endif %}> Soterrado<br></label>
+      <label class="valor 10 editar invisible"><input type="radio" name="ubicacion" value="SEM" {% if elemento.ubicacion == 'SEM' %}checked{% endif %}> Semisoterrado<br></label>
+      <label class="valor 10 editar invisible"><input type="radio" name="ubicacion" value="SUP" {% if elemento.ubicacion == 'SUP' %}checked{% endif %}> Superficie<br></label>
+      <label class="valor 10 editar invisible"><input type="radio" name="ubicacion" value="ELE" {% if elemento.ubicacion == 'ELE' %}checked{% endif %}> Elevado<br></label>
+
+      <span id="etiqueta-11" class="etiqueta">Material<br></span>
+      <span class="editar">{% if elemento.material %}{{elemento.material}}{% else %}-{% endif %}<br></span>
+      <label class="valor 11 editar invisible" onclick="outros('mat', 0)"><input type="radio" name="material" value="FOR" {% if elemento.material == 'FOR' %}checked{% endif %}> Formigón<br></label>
+      <label class="valor 11 editar invisible" onclick="outros('mat', 0)"><input type="radio" name="material" value="LAD" {% if elemento.material == 'LAD' %}checked{% endif %}> Ladrillo<br></label>
+      <label class="valor 11 editar invisible" onclick="outros('mat', 0)"><input type="radio" name="material" value="MET" {% if elemento.material == 'MET' %}checked{% endif %}> Metálico<br></label>
+      <label class="valor 11 editar invisible" onclick="outros('mat', 0)"><input type="radio" name="material" value="FIB" {% if elemento.material == 'FIB' %}checked{% endif %}> Fibra<br></label>
+      <label class="valor 11 editar invisible" onclick="outros('mat', 1)"><input type="radio" name="material" {% if elemento.material != 'FOR' and elemento.material != 'LAD' and elemento.material != 'MET' and elemento.material != 'FIB' and elemento.material != None %}checked{% endif %}> Outros<br></label>
+			<span class="editar invisible">
+				<input class="valor-11 {% if elemento.material == 'FOR' or elemento.material == 'LAD' or elemento.material == 'MET' or elemento.material == 'FIB'or elemento.material == None %}invisible{% endif %} mat-outros" type="text" name="mat-11" value="{% if elemento.material != 'FOR' and elemento.material != 'LAD' and elemento.material != 'MET' and elemento.material != 'FIB'and elemento.material != None %}{{elemento.material}}{% endif %}"><br>
+			</span>
+      <span id="etiqueta-12" class="etiqueta">Limitación de acceso<br></span>
+      <span class="editar">{% if elemento.proteccion %}{{elemento.proteccion}}{% else %}-{% endif %}<br></span>
+      <label class="valor 12 editar invisible"><input type="radio" name="proteccion" value="1" {% if elemento.proteccion %}checked{% endif %}> Correcto<br></label>
+      <label class="valor 12 editar invisible"><input type="radio" name="proteccion" value="0" {% if not elemento.proteccion %}checked{% endif %}> Deficiente<br></label>
+    </div>
+
+    <div class="ficha_xeometria apartado_ficha apartado_ficha_linea">
+
+      <span id="etiqueta-13" class="etiqueta">Pretratamento<br></span>
+      <span class="editar">{% if elemento.pretratamiento %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 13 editar invisible"><input type="radio" name="pretratamiento" value="1" {% if elemento.electricidad %}checked{% endif %}> Si<br></label>
+      <label class="valor 13 editar invisible"><input type="radio" name="pretratamiento" value="0" {% if not elemento.electricidad %}checked{% endif %}> Non<br></label>
+
+      <span id="etiqueta-14" class="etiqueta">Fisicoquímico<br></span>
+      <span class="editar">{% if elemento.fisicoquimico %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 14 editar invisible"><input type="radio" name="fisicoquimico" value="1" {% if elemento.electricidad %}checked{% endif %}> Si<br></label>
+      <label class="valor 14 editar invisible"><input type="radio" name="fisicoquimico" value="0" {% if not elemento.electricidad %}checked{% endif %}> Non<br></label>
+
+      <span id="etiqueta-15" class="etiqueta">Filtración<br></span>
+      <span class="editar">{% if elemento.filtracion %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 15 editar invisible"><input type="radio" name="filtracion" value="1" {% if elemento.electricidad %}checked{% endif %}> Si<br></label>
+      <label class="valor 15 editar invisible"><input type="radio" name="filtracion" value="0" {% if not elemento.electricidad %}checked{% endif %}> Non<br></label>
+
+      <span id="etiqueta-16" class="etiqueta">Desinfección<br></span>
+      <span class="editar">{% if elemento.desinfeccion %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 16 editar invisible"><input type="radio" name="desinfeccion" value="1" {% if elemento.electricidad %}checked{% endif %}> Si<br></label>
+      <label class="valor 16 editar invisible"><input type="radio" name="desinfeccion" value="0" {% if not elemento.electricidad %}checked{% endif %}> Non<br></label>
+
+    </div>
+
+    <div class="ficha_equipamento">
+      <span id="etiqueta-19" class="etiqueta">Subministración eléctrica<br></span>
+      <span class="editar">{% if elemento.electricidad %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 19 editar invisible"><input type="radio" name="electricidad" value="1" {% if elemento.electricidad %}checked{% endif %}> Si<br></label>
+      <label class="valor 19 editar invisible"><input type="radio" name="electricidad" value="0" {% if not elemento.electricidad %}checked{% endif %}> Non<br></label>
+
+      <span id="etiqueta-20" class="etiqueta">Telexestión<br></span>
+      <span class="editar">{% if elemento.telegestion %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 20 editar invisible"><input type="radio" name="telegestion" value="1" {% if elemento.telegestion %}checked{% endif %}> Si<br></label>
+      <label class="valor 20 editar invisible"><input type="radio" name="telegestion" value="0" {% if not elemento.telegestion %}checked{% endif %}> Non<br></label>
+
+      <span id="etiqueta-21" class="etiqueta">Cloración<br></span>
+      <span class="editar">{% if elemento.cloracion %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 21 editar invisible"><input type="radio" name="cloracion" value="1" {% if elemento.cloracion %}checked{% endif %}> Si<br></label>
+      <label class="valor 21 editar invisible"><input type="radio" name="cloracion" value="0" {% if not elemento.cloracion %}checked{% endif %}> Non<br></label>
+
+      <span id="etiqueta-22" class="etiqueta">Caudalímetro<br></span>
+      <span class="editar">{% if elemento.caudalimetro %}Si{%else%}Non{% endif %}<br></span>
+      <label class="valor 22 editar invisible"><input type="radio" name="caudalimetro" value="1" {% if elemento.caudalimetro %}checked{% endif %}> Si<br></label>
+      <label class="valor 22 editar invisible"><input type="radio" name="caudalimetro" value="0" {% if not elemento.caudalimetro %}checked{% endif %}> Non<br></label>
+
+      <span id="etiqueta-23" class="etiqueta">Notas<br></span>
+      <span class="editar">{% if elemento.notas %}{{elemento.notas}}{% else %}-{% endif %}<br></span>
+      <input id="valor-23" type="text" class="valor editar invisible" name="notas" value="{% if elemento.notas %}{{elemento.notas}}{% endif %}"><br class="valor editar invisible">
+    </div>
+
+  </span>
+	<span onclick="actualizaElemento('{{resultados.tipo[0]}}','{{elemento.provincia}}{{elemento.municipio}}{{elemento.cod_eiel}}')" class="invisible derecha editado boton_upload"><span class="material-icons">arrow_circle_up</span> Subir cambios</span>
+	<span id="check_upload" class="invisible">
+    <span class="material-icons check" style="">check_circle</span> Cambios actualizados correctamente
+  </span>
+  <span class="invisible confirmar">
+    <span class="material-icons" onclick="ConfirmaActualizaElemento('{{resultados.elemento}}', '{{resultados.id}}')">check</span> Confirmar cambios
+  </span>
+  <br>
+  <span class="invisible confirmar">
+    <span class="material-icons" onclick="cancelaActualizaElemento('{{resultados.elemento}}', {{resultados.id}})">
+      cancel
+    </span> Cancelar cambios
+  </span>
+</div>
+
+<script type="text/javascript">
+  $('.valor').keyup(function( event ) {
+    $(".boton_upload").show();
+    var indice = this.id.split("-")[1];
+    $("#etiqueta-"+indice).addClass("editado");
+    $(this).addClass("editado");
+  });
+	$('label.valor>input').change(function () {
+		var nombre = this.name;
+    var indice = $(this).parent("label").attr("class").split(" ")[1]
+		$("input[name="+ nombre+"]").parent("label").removeClass("editado");
+		$(this).parent("label").addClass("editado");
+    $(this).addClass("editado");
+		$("#etiqueta-"+indice).addClass("editado");
+		$(".boton_upload").show();
+	});
+</script>
